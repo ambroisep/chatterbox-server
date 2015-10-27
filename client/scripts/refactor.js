@@ -21,7 +21,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 var Message = Backbone.Model.extend({
-  url: 'https://api.parse.com/1/classes/chatterbox/',
+  url: 'http://127.0.0.1:3000/classes/messages/',
   defaults: {
     username: '',
     text: ''
@@ -31,7 +31,7 @@ var Message = Backbone.Model.extend({
 var Messages = Backbone.Collection.extend({
 
   model: Message,
-  url: 'https://api.parse.com/1/classes/chatterbox/',
+  url: 'http://127.0.0.1:3000/classes/messages/',
 
   loadMsgs: function() {
     this.fetch({data: { order: '-createdAt' }});
@@ -128,7 +128,7 @@ var MessagesView = Backbone.View.extend({
 
 app = {
 
-    server: 'https://api.parse.com/1/classes/chatterbox/',
+    server: 'http://127.0.0.1:3000/classes/messages/',
 
     init: function() {
       // Get username
