@@ -56,6 +56,11 @@ var requestHandler = function(request, response) {
 
   // See the note below about CORS headers.
 
+  if(request.method === 'OPTIONS'){
+    response.writeHead(200, headers);
+    response.end();
+  }
+
   if(request.url.slice(0,9) === '/classes/'){
     roomName = request.url.slice(9).split('?')[0];
     headers['Content-Type'] = 'application/json';
@@ -77,10 +82,11 @@ var requestHandler = function(request, response) {
         response.end(responseBody);
       });
     } else if (request.method === 'GET') {
+      statusCode = 200;
       responseBody = JSON.stringify({results: db});
       response.writeHead(statusCode, headers);
       response.end(responseBody);
-    }
+    } 
   } else if(request.url === '/') {
     readFile('./client/refactor.html', response);
   } else {
@@ -143,7 +149,7 @@ var readFile = function(fileName, response){
       var encoding = 'utf-8';
       console.log('ok')
       statusCode = 200;
-      ext = fileName.split('.')[1];
+      ext = fileName.split('.')[2];
       if (ext === 'js') {
         contentType = 'text/javascript';
       } else if (ext === 'css') {
