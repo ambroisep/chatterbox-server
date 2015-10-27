@@ -27,7 +27,7 @@ var requestHandler = function(request, response) {
   // Adding more logging to your server can be an easy way to get passive
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
-  console.log("Serving request type " + request.method + " for url " + request.url)
+  console.log("Serving request type " + request.method + " for url " + JSON.stringify(request.headers));
   //console.log(request);
 
   //if user makes an OPTIONS request
@@ -43,34 +43,41 @@ var requestHandler = function(request, response) {
   // The outgoing status.
   var statusCode = 200;
 
+
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
+  var roomName;
 
+  if(request.url.slice(0,9) === '/classes/'){
+    roomName = request.url.slice(9).split('?')[0];
+    headers['Content-Type'] = 'application/json';
+    var responseBody;
+
+    if (request.method === 'POST') {
+      var json = '';
+      var dateTime = Date.now();
+      request.on('data', function(datum){
+        json += datum.toString();
+      });
+      request.on('end', function() {
+        json = JSON.parse(json);
+        json.createdAt = dateTime;
+        json.objectId =dateTime;
+        db.push(json);
+        responseBody = JSON.stringify(json);
+      });
+      statusCode = 201;
+    } else if (request.method === 'GET') {
+      responseBody = JSON.stringify({results: db});
+    }
+  } else {
+    statusCode = 404;
+    responseBody = 'Unknown URL';
+  }
   // Tell the client we are sending them plain text.
   //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
-  headers['Content-Type'] = 'application/json';
-  var responseBody;
-
-  if (request.method === 'POST') {
-    var json = '';
-    var dateTime = Date.now();
-    request.on('data', function(datum){
-      json += datum.toString();
-    });
-    request.on('end', function() {
-      json = JSON.parse(json);
-      json.createdAt = dateTime;
-      json.objectId =dateTime;
-      db.push(json);
-      responseBody = JSON.stringify(json);
-    });
-  }
-
-  if (request.method === 'GET') {
-    responseBody = JSON.stringify({results: db});
-  }
 
 
   // .writeHead() writes to the request line and headers of the response,
