@@ -27,7 +27,18 @@ var requestHandler = function(request, response) {
   // Adding more logging to your server can be an easy way to get passive
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
-  console.log("Serving request type " + request.method + " for url " + request.url);
+  console.log("Serving request type " + request.method + " for url " + request.url)
+  //console.log(request);
+
+  //if user makes an OPTIONS request
+    //send back the headers
+
+  //if user makes a POST request (request.some property === POST)
+    //store data from POST request
+    //send the data back to the user with the proper headers (code = 200, etc)
+
+  //if user makes a GET request (request.method === 'GET')
+    //retreive all data applying callback to filter the data
 
   // The outgoing status.
   var statusCode = 200;
@@ -39,7 +50,28 @@ var requestHandler = function(request, response) {
   //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
-  headers['Content-Type'] = "text/plain";
+  headers['Content-Type'] = 'application/json';
+  var responseBody;
+
+  if (request.method === 'POST') {
+    var json = '';
+    var dateTime = Date.now();
+    request.on('data', function(datum){
+      json += datum.toString();
+    });
+    request.on('end', function() {
+      json = JSON.parse(json);
+      json.createdAt = dateTime;
+      json.objectId =dateTime;
+      db.push(json);
+      responseBody = JSON.stringify(json);
+    });
+  }
+
+  if (request.method === 'GET') {
+    responseBody = JSON.stringify({results: db});
+  }
+
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
@@ -52,9 +84,10 @@ var requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  response.end("Hello, World!");
+  response.end(responseBody);
 };
 
+module.exports.requestHandler = requestHandler;
 // These headers will allow Cross-Origin Resource Sharing (CORS).
 // This code allows this server to talk to websites that
 // are on different domains, for instance, your chat client.
@@ -71,3 +104,4 @@ var defaultCorsHeaders = {
   "access-control-max-age": 10 // Seconds.
 };
 
+var db = [];
