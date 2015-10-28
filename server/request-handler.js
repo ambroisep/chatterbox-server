@@ -14,17 +14,13 @@ var requestHandler = function(request, response) {
   if(request.url.slice(0,9) === '/classes/'){
     roomName = request.url.slice(9).split('?')[0];
     if (request.method === 'POST') {
-      var json = '';
       var dateTime = Date.now();
-      request.on('data', function(datum){
-        json += datum.toString();
-      });
-      request.on('end', function() {
-        json = JSON.parse(json);
-        json.createdAt = dateTime;
-        json.objectId =dateTime;
-        db.push(json);
-        responseBody = JSON.stringify(json);
+      utils.collectData(request, function(json) {
+        var data = JSON.parse(json);
+        data.createdAt = dateTime;
+        data.objectId = dateTime;
+        db.push(data);
+        responseBody = JSON.stringify(data);
         utils.sendResponse(response, responseBody, 201);
       });
     } else if (request.method === 'GET') {

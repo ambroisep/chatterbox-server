@@ -15,15 +15,15 @@ exports.sendResponse = function(response, data, params) {
   response.end(data, encoding);
 };
 
-// exports.collectData = function(request, callback) {
-//   var data = "";
-//   request.on('data', function(chunk) {
-//     data += chunk;
-//   });
-//   request.on('end', function() {
-//     callback(JSON.parse(data));
-//   });
-// };
+exports.collectData = function(request, callback) {
+  var data = '';
+  request.on('data', function(chunk) {
+    data += chunk.toString();
+  });
+  request.on('end', function() {
+    callback(data);
+  });
+};
 
 // exports.makeActionHandler = function(actionMap) {
 //   return function(request, response) {
